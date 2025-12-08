@@ -1,4 +1,5 @@
 networks:
+  grafana:
   otel-colector:
 
 services:
@@ -15,4 +16,25 @@ services:
       - ./loki-config.yaml:/etc/loki/loki-config.yaml
       - ./.container/loki-data:/loki
     networks:
+      - grafana
       - otel-colector
+
+  grafana:
+    image: grafana/grafana:latest
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+    entrypoint: /download-dashboards.sh
+    volumes:
+      - ./grafana-datasources.yaml:/etc/grafana/provisioning/datasources/ds.yaml:ro
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./grafana/dashboard-list.txt:/etc/grafana/dashboard-list.txt:ro
+      - ./grafana/download-dashboards.sh:/download-dashboards.sh:ro
+
+      - ./.container/grafana-data:/var/lib/grafana
+    networks:
+      - grafana
