@@ -1,0 +1,18 @@
+networks:
+  otel-colector:
+
+services:
+  loki:
+    image: grafana/loki:3.6.2
+    restart: always
+    ports:
+      - "3100:3100"
+      - "9095:9095"
+    command: >
+      -config.expand-env=true
+      -config.file=/etc/loki/loki-config.yaml
+    volumes:
+      - ./loki-config.yaml:/etc/loki/loki-config.yaml
+      - ./.container/loki-data:/loki
+    networks:
+      - otel-colector
