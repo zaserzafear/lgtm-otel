@@ -8,7 +8,7 @@ services:
     restart: always
     ports:
       - "3100:3100"
-      - "9095:9095"
+      # - "9095:9095"
     command: >
       -config.expand-env=true
       -config.file=/etc/loki/loki-config.yaml
@@ -38,3 +38,46 @@ services:
       - ./.container/grafana-data:/var/lib/grafana
     networks:
       - grafana
+
+  memcached:
+    build:
+      context: .
+      dockerfile: memcached.Dockerfile
+    restart: always
+    ports:
+      - "11211:11211"
+    healthcheck:
+      test: ["CMD", "/bin/nc", "-z", "memcached", "11211"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    environment:
+      - MEMCACHED_MAX_MEMORY=64m
+      - MEMCACHED_THREADS=4
+    networks:
+      - otel-colector
+
+  tempo:
+    image: grafana/tempo:2.9.0
+    restart: always
+    depends_on:
+      memcached:
+        condition: service_healthy
+    ports:
+      - "14268:14268"
+      - "3200:3200"
+      # - "9095:9095"
+      - "4317:4317"
+      - "4318:4318"
+      - "9411:9411"
+    command: >
+      -config.expand-env=true
+      -config.file=/etc/tempo/tempo-config.yaml
+    volumes:
+      - ./tempo-config.yaml:/etc/tempo/tempo-config.yaml
+      - ./tempo-overrides.yaml:/etc/tempo/overrides.yaml
+      - ./.container/tempo-data:/var/tempo
+    networks:
+      - grafana
+      - otel-colector
