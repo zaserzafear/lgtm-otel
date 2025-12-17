@@ -26,6 +26,8 @@ blocks_storage:
     dir: /var/mimir/blocks
   tsdb:
     dir: /var/mimir/tsdb
+  bucket_store:
+    sync_dir: /var/mimir/tsdb-sync
 
 ruler:
   rule_path: /var/mimir/ruler-tmp
@@ -34,6 +36,13 @@ ruler_storage:
   backend: filesystem
   filesystem:
     dir: /var/mimir/ruler-storage
+
+compactor:
+  data_dir: /var/mimir/data-compactor/
+  compaction_interval: 1h
+
+activity_tracker:
+  filepath: /var/mimir/metrics-activity.log
 
 limits:
   max_global_series_per_user: 0
