@@ -1,0 +1,41 @@
+multitenancy_enabled: false
+
+server:
+  http_listen_port: 9009
+  grpc_listen_port: 9095
+  log_level: info
+
+memberlist:
+  join_members:
+    - mimir
+
+distributor:
+  ring:
+    kvstore:
+      store: memberlist
+
+ingester:
+  ring:
+    kvstore:
+      store: memberlist
+    replication_factor: 1
+
+blocks_storage:
+  backend: filesystem
+  filesystem:
+    dir: /var/mimir/blocks
+  tsdb:
+    dir: /var/mimir/tsdb
+
+ruler:
+  rule_path: /var/mimir/ruler-tmp
+
+ruler_storage:
+  backend: filesystem
+  filesystem:
+    dir: /var/mimir/ruler-storage
+
+limits:
+  max_global_series_per_user: 0
+  max_global_series_per_metric: 0
+  compactor_blocks_retention_period: 336h

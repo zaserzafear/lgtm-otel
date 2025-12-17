@@ -16,10 +16,10 @@ schema_config:
 
 storage_config:
   tsdb_shipper:
-    active_index_directory: /loki/tsdb-index
-    cache_location: /loki/tsdb-cache
+    active_index_directory: /var/loki/tsdb-index
+    cache_location: /var/loki/tsdb-cache
   filesystem:
-    directory: /loki/chunks
+    directory: /var/loki/chunks
 
 common:
   replication_factor: 1
@@ -30,7 +30,7 @@ common:
 ingester:
   wal:
     enabled: true
-    dir: /loki/wal
+    dir: /var/loki/wal
   chunk_idle_period: 5m
   max_chunk_age: 1h
 
@@ -41,7 +41,7 @@ limits_config:
   retention_period: 336h # 14 days retention
 
 compactor:
-  working_directory: /loki/compactor
+  working_directory: /var/loki/compactor
   compaction_interval: 1h
   retention_enabled: true
   retention_delete_delay: 12h
