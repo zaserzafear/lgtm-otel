@@ -1,5 +1,5 @@
 env:
-  FLUSH_INTERVAL: 5
+  FLUSH_INTERVAL: 1
   GRACE_INTERVAL: 30
 
 service:
@@ -12,8 +12,8 @@ pipeline:
     - name: forward
       listen: 0.0.0.0
       port: 24224
-      buffer_chunk_size: 1MB
-      buffer_max_size: 5MB
+      buffer_chunk_size: 10MB
+      buffer_max_size: 50MB
 
   filters:
     - name: lua
@@ -24,3 +24,10 @@ pipeline:
   outputs:
     - name: stdout
       match: "*"
+
+    - name: loki
+      match: "docker.*"
+      host: loki
+      port: 3100
+      compress: gzip
+      labels: job=fluentbit, container_name=$container_name, service_name=$service_name, docker_tag=$docker_tag
