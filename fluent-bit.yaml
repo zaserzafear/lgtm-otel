@@ -1,0 +1,26 @@
+env:
+  FLUSH_INTERVAL: 5
+  GRACE_INTERVAL: 30
+
+service:
+  flush: ${FLUSH_INTERVAL}
+  grace: ${GRACE_INTERVAL}
+  daemon: off
+
+pipeline:
+  inputs:
+    - name: forward
+      listen: 0.0.0.0
+      port: 24224
+      buffer_chunk_size: 1MB
+      buffer_max_size: 5MB
+
+  filters:
+    - name: lua
+      match: "docker.*"
+      script: /fluent-bit/scripts/strip_container_name.lua
+      call: strip_name
+
+  outputs:
+    - name: stdout
+      match: "*"
